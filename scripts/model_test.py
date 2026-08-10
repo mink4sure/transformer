@@ -1,5 +1,5 @@
 from attention import Attention
-from encoder import Encoder
+from encoder import Encoder, EncoderStack
 import torch
 from torch.nn.modules.activation import ReLU
 
@@ -9,14 +9,30 @@ y = torch.Tensor([[.8, .2], [.8, .2], [.5, .5]])
 
 
 # Testing Attention Layer
+print("#------ Testing attention layer ------")
 model = Attention(dx=3, dy=2, dk=4, dv=4, act=ReLU)
-
 result = model.forward(x, y)
 print(result)
+print(f"Model structure: {model}\n\n")
+for name, param in model.named_parameters():
+    print(f"Layer: {name} | Size: {param.size()} | Values : {param[:2]} \n")
 
 
 # Testing Encoder Layer
+print("\n#------ Testing encoder layer ------")
 model = Encoder(dx=3, d_model=4)
 result = model.forward(x)
 print(result)
+print(f"Model structure: {model}\n\n")
+for name, param in model.named_parameters():
+    print(f"Layer: {name} | Size: {param.size()} | Values : {param[:2]} \n")
 
+
+# Testing Encoder Layer
+print("\n#------ Testing encoder stack ------")
+model = EncoderStack(n=3, dx=3, d_model=4)
+result = model.forward(x)
+print(result)
+print(f"Model structure: {model}\n\n")
+for name, param in model.named_parameters():
+    print(f"Layer: {name} | Size: {param.size()} | Values : {param[:2]} \n")

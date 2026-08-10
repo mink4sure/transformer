@@ -49,3 +49,19 @@ class Encoder(nn.Module):
         
         return self.ff_norm_layer(feed_forward + normalized_attention)
 
+
+class EncoderStack(nn.Module):
+    """ A stack of encoders
+    """
+    def __init__(self, n, dx, d_model, mask=None, act=GELU):
+        super().__init__()
+        self.first_encoder = Encoder(dx, d_model, mask, act)
+        self.remaining_encoder_list = nn.ModuleList(
+                [Encoder(d_model, d_model, mask, act) for i in range(1, n)]
+            ) 
+
+    def forward(self, x):
+        x = self.first_encoder(x)
+        for e in self.remaining_encoder_list:
+            x = e(x)
+        return x
