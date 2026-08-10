@@ -64,3 +64,44 @@ class Attention(nn.Module):
 
     def forward(self, x, y):
         return self.attention(x, y)
+    
+
+class MultiHeadAttention(nn.Module):
+    """ Simple multi head attention class
+
+    I'm going to make the computationally ineffient decision and just run
+    serveral attention layers seperately and concat their results. Other 
+    implementations smartly utilize reshape and transpose functions to
+    limit the ammount of matrix operations.
+
+    Parameters:
+        - h:    Number of heads
+        - dx:   Dimensionality of the tokens/embeddings from which to calculate
+                Query tensor.
+        - dy:   Dimensionality of the tokens/embeddings from which to calculate
+                the Key and Value tensors.
+        - dk:   Dimensionality of the Query and Key tensors in each head
+        - dv:   Dimensionality of the Value tensor in each head
+        - mask:
+        - act:
+    """
+    def __init__(self, h, dx, dy, dk, dv, mask=None, act=GELU):
+        super().__init__()
+        self.h = h
+        self.dx = dx
+        self.dy = dy
+        self.dk = dk
+        self.dv = dv
+        self.mask = mask
+        self.act = act
+
+        self.attention_heads = nn.ModuleList(
+                [Attention(self.dx, self.dy, self.dk, self.dv, self.mask, self.act) for i in range(self.h)]
+            )
+        
+    def forward(self, x, y):
+        concatted_attention = torch.Tensor()
+        for i, a in enumerate(self.attention_heads):
+            attention_head_i = a.forward(x, y)
+            concatted_attention = torch.cat((concatted_attention, attention_head_i), dim=-1)
+        return concatted_attention
