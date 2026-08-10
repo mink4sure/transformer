@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from torch import nn
+from torch.nn.modules.activation import GELU
 
 
 class Attention(nn.Module):
@@ -9,7 +10,7 @@ class Attention(nn.Module):
     Attention(Q,V,K) = matmul(softmax(matmul(Q,K.T)/sqrt(dk)),V)
 
     """        
-    def __init__(self, dx: int, dy: int, dk: int, dv: int, mask=None):
+    def __init__(self, dx: int, dy: int, dk: int, dv: int, mask=None, act=GELU):
         super().__init__()
         self.dx = dx
         self.dy = dy
@@ -17,10 +18,19 @@ class Attention(nn.Module):
         self.dv = dv
         self.mask = mask
 
-        self.query_layer = nn.Linear(dx, dk, bias=False)
-        self.key_layer = nn.Linear(dy, dk, bias=False)
-        self.value_layer = nn.Linear(dy, dv, bias=False)
-        self.activation_layer = nn.modules.activation.Softmax(dim=-1)
+        self.query_layer = nn.Sequential(
+                nn.Linear(dx, dk, bias=False),
+                act(),
+            )
+        self.key_layer = nn.Sequential(
+                nn.Linear(dy, dk, bias=False),
+                act(),
+            )
+        self.value_layer = nn.Sequential(
+                nn.Linear(dy, dv, bias=False),
+                act(),
+            )
+        self.softmax_layer = nn.modules.activation.Softmax(dim=-1)
 
 
     def attention(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
@@ -46,7 +56,7 @@ class Attention(nn.Module):
         if self.mask is not None:
             assert False, "Masking in attention not yet implemented"
 
-        attention = self.activation_layer(attention)
+        attention = self.softmax_layer(attention)
         attention = torch.matmul(attention, v)
         
         return attention
