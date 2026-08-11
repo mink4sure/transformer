@@ -18,3 +18,9 @@ Inspired by some dataset found on `huggingface.co`, I think the dataset can be a
 
 ### Running Some Code
 The project stucture is designed such that the code in ran from the `scripts/` directory. To run a "test" on modules in the `model/`, use `python -m test.attention_test`.
+
+## TODO
+ - [ ] Implement the DecoderStack
+ - [ ] Implement masking in the attention layer
+ - [ ] Think of a training method
+    - Could be 'denoising': text -> tokenize -> corrupt -> transformer model -> compare output with original tokens 
