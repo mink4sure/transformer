@@ -16,4 +16,5 @@ Inspired by some dataset found on `huggingface.co`, I think the dataset can be a
  - ...
  On a second thought... I just will just use a dataset from `huggingface.co`.
 
-
+### Running Some Code
+The project stucture is designed such that the code in ran from the `scripts/` directory. To run a "test" on modules in the `model/`, use `python -m test.attention_test`.
