@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from attention import MultiHeadAttention
+from model.attention import MultiHeadAttention
 from torch.nn.modules.normalization import LayerNorm
 from torch.nn.modules.activation import GELU
 
