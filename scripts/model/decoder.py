@@ -90,4 +90,58 @@ class DecoderBlock(nn.Module):
 
         return result_feed_forward_norm
 
-            
+
+class DecoderStack(nn.Module):
+    """ A stack of DecoderBlock's
+
+    The forward method of each decoder block has the arguments x and y.
+    x Is associated with the output of the encoder and y with the output
+    of the previous decoder block. The first decoder does not have a 
+    previous decoder block, thus it will be given the arguments (x, x).
+    
+    Parameters:
+        - n:    Number of decoders to stack
+        - dx:   Dimensionality of the encoder output
+        - h:    Number of heads in each multi head attention layer
+        - dh:   Dimensionality of each head
+        - dout: Dimensionality of the output of each DecoderBlock
+        - mask: The mask used in the attention layer
+        - act:  The activation function used in the attention layer
+    """
+    def __init__(self, n, dx, h, dh, dout, mask=None, act=GELU):
+        super().__init__()
+        self.n = n
+        self.dx = dx
+        self.h = h
+        self.dh = dh
+        self.dout = dout
+        self.mask = mask
+        self.act = act
+
+        self.first_decoder_block = DecoderBlock(
+                din = self.dx,
+                dx = self.dx,
+                h = self.h,
+                dh = self.dh,
+                dout = self.dout,
+                mask = self.mask,
+                act = self.act,
+            ) 
+        self.remaining_decoder_blocks = nn.ModuleList([
+                DecoderBlock(
+                    din = self.dout,
+                    dx = self.dx,
+                    h = self.h,
+                    dh = self.dh,
+                    dout = self.dout,
+                    mask = self.mask,
+                    act = self.act,
+                ) for i in range(1, n)
+            ])
+
+
+    def forward(self, x):
+        y = self.first_decoder_block.forward(x, x)
+        for d in self.remaining_decoder_blocks:
+            y = d.forward(x, y)
+        return y
