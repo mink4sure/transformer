@@ -20,7 +20,7 @@ for name, param in model.named_parameters():
 
 # Testing MultiHeadAttention Layer
 print("#------ Testing multi head attention layer ------")
-model = MultiHeadAttention(h=3, dx=3, dy=2, dk=2, dv=2, act=ReLU)
+model = MultiHeadAttention(h=3, dx=3, dy=2, dk=2, dv=2)
 result = model.forward(x, y)
 print(result)
 print(f"Model structure: {model}\n\n")
@@ -30,7 +30,7 @@ for name, param in model.named_parameters():
 
 # Testing Encoder Layer
 print("\n#------ Testing encoder layer ------")
-model = Encoder(dx=3, d_model=4)
+model = Encoder(h=3, dh=4, dx=3, d_layer=12)
 result = model.forward(x)
 print(result)
 print(f"Model structure: {model}\n\n")
@@ -40,7 +40,7 @@ for name, param in model.named_parameters():
 
 # Testing Encoder Layer
 print("\n#------ Testing encoder stack ------")
-model = EncoderStack(n=3, dx=3, d_model=4)
+model = EncoderStack(n=3, h=3, dh=4, dx=3, d_layer=12)
 result = model.forward(x)
 print(result)
 print(f"Model structure: {model}\n\n")
