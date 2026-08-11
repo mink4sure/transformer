@@ -5,7 +5,7 @@ from torch.nn.modules.activation import GELU
 
 
 class Attention(nn.Module):
-    """ Generic attention block
+    """ Generic attention layer 
 
     Attention(Q,V,K) = matmul(softmax(matmul(Q,K.T)/sqrt(dk)),V)
 
