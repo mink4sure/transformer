@@ -9,6 +9,13 @@ class Attention(nn.Module):
 
     Attention(Q,V,K) = matmul(softmax(matmul(Q,K.T)/sqrt(dk)),V)
 
+    Parameters:
+        - dx:   Dimensionality of the tensor from which to calulate the Queries
+        - dy:   Dimensionality of the tensor form which to calculate the Keys and Values
+        - dk:   Dimensionality of the Queries and Keys
+        - dv:   Dimensionality of the Values
+        - mask: Function to mask the matmul(Q,K.T) tensor
+        - act:  Activation function used in the calcualtion of the Queries, Keys and Values
     """        
     def __init__(self, dx: int, dy: int, dk: int, dv: int, mask=None, act=GELU):
         super().__init__()
