@@ -61,7 +61,7 @@ class Attention(nn.Module):
         attention = torch.matmul(q, kt)/np.sqrt(self.dk)
         
         if self.mask is not None:
-            assert False, "Masking in attention not yet implemented"
+            attention = self.mask(attention)
 
         attention = self.softmax_layer(attention)
         attention = torch.matmul(attention, v)
