@@ -6,8 +6,8 @@ from torch.nn.modules.normalization import LayerNorm
 from torch.nn.modules.activation import GELU
 
 
-class Encoder(nn.Module):
-    """ Encoder Layer
+class EncoderBlock(nn.Module):
+    """ Encoder block 
 
     A simplefied verison of what is implemented in "Attention is all you need".
     The simplification is in the use of only ONE attention head. 
@@ -86,7 +86,7 @@ class EncoderStack(nn.Module):
         self.mask = mask
         self.act = act
 
-        self.first_encoder = Encoder(
+        self.first_encoder = EncoderBlock(
                 dx = self.dx,
                 h = self.h,
                 dh = self.dh,
@@ -95,7 +95,7 @@ class EncoderStack(nn.Module):
                 act = self.act
             )
         self.remaining_encoder_list = nn.ModuleList([
-                Encoder(
+                EncoderBlock(
                     dx = self.d_layer,
                     h = self.h,
                     dh = self.dh,
