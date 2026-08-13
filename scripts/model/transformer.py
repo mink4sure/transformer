@@ -38,7 +38,7 @@ class Transformer(nn.Module):
                 dx = self.dx,
                 h = self.nh,
                 dh = self.dh,
-                d_layer = self.nh*self.dh,
+                dout = self.nh*self.dh,
                 act = self.act,
             )
         self.decoder_stack = DecoderStack(

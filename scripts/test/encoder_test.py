@@ -8,7 +8,7 @@ y = torch.Tensor([[.8, .2], [.8, .2], [1, 0], [0, 1]])
 
 # Testing Encoder Layer
 print("\n#------ Testing encoder layer ------")
-model = EncoderBlock(h=3, dh=4, dx=3, d_layer=12)
+model = EncoderBlock(h=3, dh=4, din=3, dout=12)
 result = model.forward(x)
 print(result)
 print(f"Model structure: {model}\n\n")
@@ -18,7 +18,7 @@ for name, param in model.named_parameters():
 
 # Testing Encoder Stack 
 print("\n#------ Testing encoder stack ------")
-model = EncoderStack(n=3, h=3, dh=4, dx=3, d_layer=12)
+model = EncoderStack(n=3, h=3, dh=4, dx=3, dout=12)
 result = model.forward(x)
 print(result)
 print(f"Model structure: {model}\n\n")
