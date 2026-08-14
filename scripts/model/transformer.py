@@ -23,14 +23,13 @@ class Transformer(nn.Module):
         - nh:   Number of heads
         - dh:   Dimensionality of each head
         """
-    def __init__(self, dx, ne, nd, nh, dh, mask=torch.triu, act=GELU):
+    def __init__(self, dx, ne, nd, nh, dh, act=GELU):
         super().__init__()
         self.dx = dx
         self.ne = ne
         self.nd = nd
         self.nh = nh
         self.dh = dh
-        self.mask = mask
         self.act = act
 
         self.encoder_stack = EncoderStack(
@@ -47,7 +46,6 @@ class Transformer(nn.Module):
                 h = self.nh,
                 dh = self.dh,
                 dout = self.nh*self.dh,
-                mask = self.mask,
                 act = self.act,
             )
         self.linear = nn.Linear(self.nh*self.dh, dx)

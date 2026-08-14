@@ -22,8 +22,9 @@ class EncoderBlock(nn.Module):
         - dh (int): Dimensionality per head
         - dout (int):    Output dimensionality of the encoder layer. The final forward
                             layer goes from h*dh to d_layer
+        - mask: Whether or not to apply causal masking
     """
-    def __init__(self, din: int, h: int, dh: int, dout: int, mask=None, act=GELU):
+    def __init__(self, din: int, h: int, dh: int, dout: int, mask=False, act=GELU):
         super().__init__()
         self.din = din 
         self.h = h
@@ -76,7 +77,7 @@ class EncoderStack(nn.Module):
         - dout(int):    Output dimensionality of the encoder layer. The final forward
                             layer goes from h*dh to d_layer
     """
-    def __init__(self, n, dx, h, dh, dout, mask=None, act=GELU):
+    def __init__(self, n, dx, h, dh, dout, mask=False, act=GELU):
         super().__init__()
         self.n = n
         self.dx = dx

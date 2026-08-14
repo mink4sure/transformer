@@ -13,9 +13,9 @@ class Attention(nn.Module):
         - dy:   Dimensionality of the tensor form which to calculate the Keys and Values
         - dk:   Dimensionality of the Queries and Keys
         - dv:   Dimensionality of the Values
-        - mask: Function to mask the matmul(Q,K.T) tensor
+        - mask: Whether or not to apply causal masking
     """        
-    def __init__(self, dx: int, dy: int, dk: int, dv: int, mask=None):
+    def __init__(self, dx: int, dy: int, dk: int, dv: int, mask=False):
         super().__init__()
         self.dx = dx
         self.dy = dy
@@ -49,8 +49,10 @@ class Attention(nn.Module):
         kt = torch.transpose(k, 0, 1)
         attention = torch.matmul(q, kt)/np.sqrt(self.dk)
         
-        if self.mask is not None:
-            attention = self.mask(attention)
+        if self.mask:
+            mask = torch.ones_like(attention) * float('-inf')
+            mask = torch.triu(mask, diagonal=1)
+            attention += mask
 
         attention = self.softmax_layer(attention)
         attention = torch.matmul(attention, v)
@@ -79,9 +81,9 @@ class MultiHeadAttention(nn.Module):
         - dk:   Dimensionality of the Query and Key tensors in each head
         - dv:   Dimensionality of the Value tensor in each head
         - dout: Dimensionality of the output projection
-        - mask:
+        - mask: Wheter or not to apply causal masking
     """
-    def __init__(self, h, dx, dy, dk, dv, dout, mask=None):
+    def __init__(self, h, dx, dy, dk, dv, dout, mask=False):
         super().__init__()
         self.h = h
         self.dx = dx

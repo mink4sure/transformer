@@ -14,20 +14,18 @@ class DecoderBlock(nn.Module):
         - h:    Number of heads for each multi head attention layer
         - dh:   Dimensionality of each head
         - dout: Output dimensionality of the feed forward layer
-        - mask: The mask used in the attention layer
         - act:  The activation function used in the feed forward layer
 
     The paper implements a model where h*dh=dout, however I won't let
     this be a necessary constraint.
     """
-    def __init__(self, din, dx, h, dh, dout, mask=None, act=GELU):
+    def __init__(self, din, dx, h, dh, dout, act=GELU):
         super().__init__()
         self.din = din
         self.dx = dx
         self.h = h
         self.dh = dh
         self.dout = dout
-        self.mask = mask
         self.act = act
 
         self.mh_self_attention_layer = MultiHeadAttention(
@@ -37,7 +35,7 @@ class DecoderBlock(nn.Module):
                 dk = self.dh,
                 dv = self.dh,
                 dout = self.h*self.dh,
-                mask = self.mask,
+                mask = True, 
             )
         self.mh_self_attention_norm_layer = nn.LayerNorm(self.h*self.dh)
         self.mh_cross_attention_layer = MultiHeadAttention(
@@ -47,7 +45,6 @@ class DecoderBlock(nn.Module):
                 dk = self.dh,
                 dv = self.dh,
                 dout = self.h*self.dh,
-                mask = None,    # Paper does not indicate the presence of masking in this layer
             )
         self.mh_cross_attention_norm_layer = nn.LayerNorm(self.h*self.dh)
         self.feed_forward_layer = nn.Sequential(
@@ -105,7 +102,6 @@ class DecoderStack(nn.Module):
         - h:    Number of heads in each multi head attention layer
         - dh:   Dimensionality of each head
         - dout: Dimensionality of the output of each DecoderBlock
-        - mask: The mask used in the attention layer
         - act:  The activation function used in the feed forward layer
     """
     def __init__(self, n, dx, h, dh, dout, mask=None, act=GELU):
@@ -115,7 +111,6 @@ class DecoderStack(nn.Module):
         self.h = h
         self.dh = dh
         self.dout = dout
-        self.mask = mask
         self.act = act
 
         self.first_decoder_block = DecoderBlock(
@@ -124,7 +119,6 @@ class DecoderStack(nn.Module):
                 h = self.h,
                 dh = self.dh,
                 dout = self.dout,
-                mask = self.mask,
                 act = self.act,
             ) 
         self.remaining_decoder_blocks = nn.ModuleList([
@@ -134,7 +128,6 @@ class DecoderStack(nn.Module):
                     h = self.h,
                     dh = self.dh,
                     dout = self.dout,
-                    mask = self.mask,
                     act = self.act,
                 ) for i in range(1, n)
             ])
