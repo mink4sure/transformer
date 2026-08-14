@@ -19,7 +19,7 @@ for name, param in model.named_parameters():
 
 # Testing MultiHeadAttention Layer
 print("#------ Testing multi head attention layer ------")
-model = MultiHeadAttention(h=3, dx=3, dy=2, dk=2, dv=2)
+model = MultiHeadAttention(h=3, dx=3, dy=2, dk=2, dv=2, dout=10)
 result = model.forward(x, y)
 print(result)
 print(f"Model structure: {model}\n\n")

@@ -38,6 +38,7 @@ class EncoderBlock(nn.Module):
                 dy = self.din,
                 dk = self.dh,
                 dv = self.dh,
+                dout = self.h*self.dh,
                 mask = self.mask,
             )
         self.mh_attention_norm_layer = LayerNorm(self.h*self.dh)

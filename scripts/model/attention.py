@@ -78,24 +78,33 @@ class MultiHeadAttention(nn.Module):
                 the Key and Value tensors.
         - dk:   Dimensionality of the Query and Key tensors in each head
         - dv:   Dimensionality of the Value tensor in each head
+        - dout: Dimensionality of the output projection
         - mask:
     """
-    def __init__(self, h, dx, dy, dk, dv, mask=None):
+    def __init__(self, h, dx, dy, dk, dv, dout, mask=None):
         super().__init__()
         self.h = h
         self.dx = dx
         self.dy = dy
         self.dk = dk
         self.dv = dv
+        self.dout = dout
         self.mask = mask
 
         self.attention_heads = nn.ModuleList(
                 [Attention(self.dx, self.dy, self.dk, self.dv, self.mask) for i in range(self.h)]
             )
+        self.output_projection_layer = nn.Linear(self.h*self.dv, self.dout)
+
         
     def forward(self, x, y):
-        concatted_attention = torch.Tensor()
-        for i, a in enumerate(self.attention_heads):
+        concatted_attention = None
+        for a in self.attention_heads:
             attention_head_i = a.forward(x, y)
-            concatted_attention = torch.cat((concatted_attention, attention_head_i), dim=-1)
-        return concatted_attention
+            if concatted_attention is None:
+                concatted_attention = attention_head_i
+            else:
+                concatted_attention = torch.cat((concatted_attention, attention_head_i), dim=-1)
+        
+        output_projection = self.output_projection_layer(concatted_attention)
+        return output_projection 

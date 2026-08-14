@@ -36,6 +36,7 @@ class DecoderBlock(nn.Module):
                 dy = self.din,
                 dk = self.dh,
                 dv = self.dh,
+                dout = self.h*self.dh,
                 mask = self.mask,
             )
         self.mh_self_attention_norm_layer = nn.LayerNorm(self.h*self.dh)
@@ -45,6 +46,7 @@ class DecoderBlock(nn.Module):
                 dy = self.h*self.dh, # y will be the output of the mh_self_attention_norm_layer 
                 dk = self.dh,
                 dv = self.dh,
+                dout = self.h*self.dh,
                 mask = None,    # Paper does not indicate the presence of masking in this layer
             )
         self.mh_cross_attention_norm_layer = nn.LayerNorm(self.h*self.dh)
