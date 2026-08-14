@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 from torch import nn
-from torch.nn.modules.activation import GELU
 
 
 class Attention(nn.Module):
@@ -15,9 +14,8 @@ class Attention(nn.Module):
         - dk:   Dimensionality of the Queries and Keys
         - dv:   Dimensionality of the Values
         - mask: Function to mask the matmul(Q,K.T) tensor
-        - act:  Activation function used in the calcualtion of the Queries, Keys and Values
     """        
-    def __init__(self, dx: int, dy: int, dk: int, dv: int, mask=None, act=GELU):
+    def __init__(self, dx: int, dy: int, dk: int, dv: int, mask=None):
         super().__init__()
         self.dx = dx
         self.dy = dy
@@ -25,18 +23,9 @@ class Attention(nn.Module):
         self.dv = dv
         self.mask = mask
 
-        self.query_layer = nn.Sequential(
-                nn.Linear(dx, dk, bias=False),
-                act(),
-            )
-        self.key_layer = nn.Sequential(
-                nn.Linear(dy, dk, bias=False),
-                act(),
-            )
-        self.value_layer = nn.Sequential(
-                nn.Linear(dy, dv, bias=False),
-                act(),
-            )
+        self.query_layer = nn.Linear(dx, dk, bias=False)
+        self.key_layer = nn.Linear(dy, dk, bias=False)
+        self.value_layer = nn.Linear(dy, dv, bias=False)
         self.softmax_layer = nn.modules.activation.Softmax(dim=-1)
 
 
@@ -90,9 +79,8 @@ class MultiHeadAttention(nn.Module):
         - dk:   Dimensionality of the Query and Key tensors in each head
         - dv:   Dimensionality of the Value tensor in each head
         - mask:
-        - act:
     """
-    def __init__(self, h, dx, dy, dk, dv, mask=None, act=GELU):
+    def __init__(self, h, dx, dy, dk, dv, mask=None):
         super().__init__()
         self.h = h
         self.dx = dx
@@ -100,10 +88,9 @@ class MultiHeadAttention(nn.Module):
         self.dk = dk
         self.dv = dv
         self.mask = mask
-        self.act = act
 
         self.attention_heads = nn.ModuleList(
-                [Attention(self.dx, self.dy, self.dk, self.dv, self.mask, self.act) for i in range(self.h)]
+                [Attention(self.dx, self.dy, self.dk, self.dv, self.mask) for i in range(self.h)]
             )
         
     def forward(self, x, y):

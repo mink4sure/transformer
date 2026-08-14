@@ -15,7 +15,7 @@ class DecoderBlock(nn.Module):
         - dh:   Dimensionality of each head
         - dout: Output dimensionality of the feed forward layer
         - mask: The mask used in the attention layer
-        - act:  The activation function used in the attention layer
+        - act:  The activation function used in the feed forward layer
 
     The paper implements a model where h*dh=dout, however I won't let
     this be a necessary constraint.
@@ -37,7 +37,6 @@ class DecoderBlock(nn.Module):
                 dk = self.dh,
                 dv = self.dh,
                 mask = self.mask,
-                act = self.act
             )
         self.mh_self_attention_norm_layer = nn.LayerNorm(self.h*self.dh)
         self.mh_cross_attention_layer = MultiHeadAttention(
@@ -47,12 +46,11 @@ class DecoderBlock(nn.Module):
                 dk = self.dh,
                 dv = self.dh,
                 mask = None,    # Paper does not indicate the presence of masking in this layer
-                act = self.act
             )
         self.mh_cross_attention_norm_layer = nn.LayerNorm(self.h*self.dh)
         self.feed_forward_layer = nn.Sequential(
                 nn.Linear(self.h*self.dh, self.dout),
-                GELU(),
+                self.act(),
             )
         self.feed_forward_norm_layer = nn.LayerNorm(self.dout)
 
@@ -106,7 +104,7 @@ class DecoderStack(nn.Module):
         - dh:   Dimensionality of each head
         - dout: Dimensionality of the output of each DecoderBlock
         - mask: The mask used in the attention layer
-        - act:  The activation function used in the attention layer
+        - act:  The activation function used in the feed forward layer
     """
     def __init__(self, n, dx, h, dh, dout, mask=None, act=GELU):
         super().__init__()

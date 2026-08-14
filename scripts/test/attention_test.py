@@ -9,7 +9,7 @@ y = torch.Tensor([[.8, .2], [.8, .2], [1, 0], [0, 1]])
 
 # Testing Attention Layer
 print("#------ Testing attention layer ------")
-model = Attention(dx=3, dy=2, dk=4, dv=4, act=ReLU)
+model = Attention(dx=3, dy=2, dk=4, dv=4)
 result = model.forward(x, y)
 print(result)
 print(f"Model structure: {model}\n\n")

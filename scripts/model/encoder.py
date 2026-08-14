@@ -39,13 +39,12 @@ class EncoderBlock(nn.Module):
                 dk = self.dh,
                 dv = self.dh,
                 mask = self.mask,
-                act = self.act
             )
         self.mh_attention_norm_layer = LayerNorm(self.h*self.dh)
 
         self.feed_forward_layer = nn.Sequential(
                 nn.Linear(self.h*self.dh, self.dout, bias=False),
-                GELU(),
+                self.act(),
             )
         self.ff_norm_layer = LayerNorm(self.dout)
 
