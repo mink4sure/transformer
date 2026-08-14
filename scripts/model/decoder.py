@@ -70,7 +70,7 @@ class DecoderBlock(nn.Module):
         result_self_attention = self.mh_self_attention_layer.forward(y, y)
         residual = self.residual_layer(y)
         result_self_attention_norm = self.mh_self_attention_norm_layer(residual+result_self_attention)
-        result_cross_attention = self.mh_cross_attention_layer.forward(x, result_self_attention_norm)
+        result_cross_attention = self.mh_cross_attention_layer.forward(result_self_attention_norm, x)
         result_cross_attention_norm = self.mh_cross_attention_norm_layer(result_cross_attention + result_self_attention_norm)
         result_feed_forward = self.feed_forward_layer(result_cross_attention_norm)
         result_feed_forward_norm = torch.Tensor
