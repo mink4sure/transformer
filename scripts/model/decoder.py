@@ -37,6 +37,7 @@ class DecoderBlock(nn.Module):
                 dout = self.h*self.dh,
                 mask = True, 
             )
+        self.residual_layer = nn.Linear(self.din, self.h*self.dh)
         self.mh_self_attention_norm_layer = nn.LayerNorm(self.h*self.dh)
         self.mh_cross_attention_layer = MultiHeadAttention(
                 h = self.h,
@@ -67,13 +68,8 @@ class DecoderBlock(nn.Module):
                     Key and Value tensor.
         """
         result_self_attention = self.mh_self_attention_layer.forward(y, y)
-        result_self_attention_norm = torch.Tensor
-        if self.din == self.h*self.dh:
-            result_self_attention_norm = self.mh_self_attention_norm_layer(y+result_self_attention)
-        else: 
-            #Skipping the residual path
-            print("Skipping residual path in self attention in DecoderBlock")
-            result_self_attention_norm = self.mh_self_attention_norm_layer(result_self_attention)
+        residual = self.residual_layer(y)
+        result_self_attention_norm = self.mh_self_attention_norm_layer(residual+result_self_attention)
         result_cross_attention = self.mh_cross_attention_layer.forward(x, result_self_attention_norm)
         result_cross_attention_norm = self.mh_cross_attention_norm_layer(result_cross_attention + result_self_attention_norm)
         result_feed_forward = self.feed_forward_layer(result_cross_attention_norm)
