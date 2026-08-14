@@ -42,6 +42,7 @@ class EncoderBlock(nn.Module):
                 dout = self.h*self.dh,
                 mask = self.mask,
             )
+        self.residual_layer = nn.Linear(self.din, self.h*self.dh)
         self.mh_attention_norm_layer = LayerNorm(self.h*self.dh)
 
         self.feed_forward_layer = nn.Sequential(
@@ -54,10 +55,8 @@ class EncoderBlock(nn.Module):
     def forward(self, x):
         attention = self.mh_attention_layer.forward(x, x)
         normalized_attention = torch.zeros_like(attention)
-        if self.din==self.dout:
-            normalized_attention = self.mh_attention_norm_layer(attention + x)
-        else:
-            normalized_attention = self.mh_attention_norm_layer(attention)
+        residual = self.residual_layer(x)
+        normalized_attention = self.mh_attention_norm_layer(attention + residual)
         feed_forward = self.feed_forward_layer(normalized_attention)
         
         return self.ff_norm_layer(feed_forward + normalized_attention)
